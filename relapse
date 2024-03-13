@@ -1,5 +1,5 @@
 //This contains the models for MH relapse
-
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
 stset epis_end_dt, id(mbun) failure(rehosp==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
 foreach scale in hazard{
 		display _n "Scale = `scale'"
@@ -33,3 +33,30 @@ twoway (rarea Scloz0_lci Scloz0_uci tt, pstyle(ci) sort xscale(r(0 120)) xlabel(
 legend(ring(0) bplacement(neast) order(1 "Other drug" 2 "Clozapine"))) 
 graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_adults_graph.gph", replace
 save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame.dta", replace
+
+************* Do the same for the child cohort*****************
+use "Analysis_file_kids_7_Feb.dta"
+stset epis_end_dt, id(mbun) failure(rehosp==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
+
+Scale = hazard
+df = 1, AIC =    7542.75 BIC =    7582.33
+df = 2, AIC =    7544.61 BIC =    7590.79
+df = 3, AIC =    7543.87 BIC =    7596.64
+df = 4, AIC =    7531.91 BIC =    7591.29
+df = 5, AIC =    7515.28 BIC =    7581.26
+
+
+stpm3 i.clozapine age i.female i.rural_unk, df(5) scale(lncumhazard) vce(cluster mbun) eform difficult
+range tt 0 120 100
+standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(kidsrehosp, replace)
+frame change kidsrehosp
+lab var Scloz0 "Other drug"
+lab var Scloz1 "Clozapine"
+save "C:\Users\llb296\Cloz_2023\Kids_rehosp_frame.dta", replace
+
+twoway (rarea Scloz0_lci Scloz0_uci tt, pstyle(ci) sort xscale(r(0 120)) xlabel(0 20 40 60 80 100 120) fc(green%25)) (rarea Scloz1_lci Scloz1_uci tt, pstyle(ci) sort xscale(r(0 120))fc(red%25)) ///
+(line Scloz0 tt, sort lcolor(green) lstyle(refline) lp(dash) lwidth(vthin)) (line Scloz1 tt, sort lcolor(red) lstyle(refline) lp(solid) lwidth(vthin) xtitle("Follow-up in months") subtitle("") ///
+legend(ring(0) bplacement(neast) order(1 "Other drug" 2 "Clozapine"))) 
+graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_kids_graph.gph", replace
+*/
+
