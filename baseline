@@ -1,0 +1,126 @@
+//This contains the Stata code for tabulating the diagnoses at initial hospital visit
+************************Take child and adult unique patients to retrieve index diagnoses
+//Take kids cohort mbuns
+use "C:\Users\llb296\Cloz_2023\Analysis_file_kids_7_Feb.dta"
+bysort mbun (epis_beg_dt): keep if _n==1
+save "C:\Users\llb296\Cloz_2023\baseline\March_2_uniq_kids.dta"
+keep mbun epis_beg_dt epis_end_dt
+
+//Harmonize the variables of DAD and NACRS cohorts
+use "C:\Users\llb296\Cloz_2023\baseline\nacrs_cohorts_08_18.dta"
+
+renvars ED_DISCHARGE_DIAG_CODE_1 ED_DISCHARGE_DIAG_CODE_2 ED_DISCHARGE_DIAG_CODE_3 MAIN_PROBLEM OTHER_PROBLEM_1 OTHER_PROBLEM_2 /// 
+OTHER_PROBLEM_3 OTHER_PROBLEM_4 OTHER_PROBLEM_5 OTHER_PROBLEM_6 OTHER_PROBLEM_7 OTHER_PROBLEM_8 OTHER_PROBLEM_9 \ Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+
+keep mbun province Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 age female rural_unk source_DAD
+save "C:\Users\llb296\Cloz_2023\baseline\nacrs_4_harmon.dta"
+
+
+use "C:\Users\llb296\Cloz_2023\baseline\dad_cohorts_08_18.dta"
+
+renvars DIAG_CODE_1 DIAG_CODE_2 DIAG_CODE_3 DIAG_CODE_4 DIAG_CODE_5 DIAG_CODE_6 DIAG_CODE_7 DIAG_CODE_8 DIAG_CODE_9 ///
+DIAG_CODE_10 DIAG_CODE_11 DIAG_CODE_12 DIAG_CODE_13 DIAG_CODE_14 DIAG_CODE_15 DIAG_CODE_16 DIAG_CODE_17 DIAG_CODE_18 DIAG_CODE_19 ///
+DIAG_CODE_20 DIAG_CODE_21 DIAG_CODE_22 DIAG_CODE_23 DIAG_CODE_24 DIAG_CODE_25 \ Dx_1 Dx_2 Dx_3 Dx_4	Dx_5 Dx_6 Dx_7 Dx_8	Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25
+
+
+keep mbun province Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25 age female rural_unk source_DAD
+
+//Append the DAD and NACRS dx variables
+
+append using "C:\Users\llb296\Cloz_2023\baseline\nacrs_4_harmon.dta", generate(_appended)
+ 
+save "C:\Users\llb296\Cloz_2023\baseline\dad_nacrs_08_18_baseline.dta", replace
+
+//Check for duplicate records
+bysort mbun: gen rec_num = _n //No duplicates
+
+
+//search for codes now
+
+gen schizoph = 0
+ 
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+		replace schizoph = 1 if inlist(`var',"F200","F201","F202","F203","F204")
+		replace schizoph = 1 if inlist(`var', "F205", "F205","F206","F208", "F209")
+}	
+
+gen schizaff = 0
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace schizaff = 1 if inlist(`var',"F250","F251","F252","F258","F259")
+}
+
+gen bipolar = 0
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace bipolar = 1 if inlist(`var',"F310","F311","F312","F313","F314")
+	replace bipolar = 1 if inlist(`var',"F315","F316","F317","F318","F319")
+}
+
+gen psychos_non = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace psychos_non = 1 if inlist(`var', "F28")
+}
+
+gen psychos_org = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace psychos_org = 1 if inlist(`var', "F29")
+}
+
+gen adhd = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	
+	replace adhd = 1 if inlist(`var',"F900","F901", "F908", "F909")
+}
+
+gen conduct = 0
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	
+	replace conduct = 1 if inlist(`var',"F910","F911", "F912")
+}
+
+gen odd = 0
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	
+	replace odd = 1 if inlist(`var',"F913")
+}
+
+gen autism = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	
+	replace autism = 1 if inlist(`var',"F840", "F841")
+}
+
+
+gen adult = cond(age<18,0,1)
+
+*****************************************Now merge the kids baseline file with their DXs****************
+use "C:\Users\llb296\Cloz_2023\baseline\March_2_uniq_kids.dta"
+merge 1:m mbun using "C:\Users\llb296\Cloz_2023\baseline\dad_nacrs_08_18_baseline.dta"
+keep if _m==3
+
+foreach var of varlist schizoph schizaff bipolar psychos_non psychos_org adhd conduct odd autism{
+	tab `var'
+}
+
+*****************************************Now do the same with the adults***********************************
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
+bysort mbun (epis_beg_dt): keep if _n==1
+
+save "C:\Users\llb296\Cloz_2023\baseline\March_12_uniq_adults.dta"
+keep mbun epis_beg_dt epis_end_dt
+
+merge 1:m mbun using "C:\Users\llb296\Cloz_2023\baseline\dad_nacrs_08_18_baseline.dta"
+keep if _m==3
