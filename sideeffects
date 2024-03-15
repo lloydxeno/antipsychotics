@@ -1,4 +1,5 @@
-
+***The code here is for tabulating side effects****
+***The adverse event models are in the file adverse****
 use "C:\Users\llb296\Cloz_2023\adverse\nacrs_post_08_18.dta"
  
 renvars ED_DISCHARGE_DIAG_CODE_1 ED_DISCHARGE_DIAG_CODE_2 ED_DISCHARGE_DIAG_CODE_3 MAIN_PROBLEM OTHER_PROBLEM_1 OTHER_PROBLEM_2 /// 
