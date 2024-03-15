@@ -1,0 +1,93 @@
+
+use "C:\Users\llb296\Cloz_2023\adverse\nacrs_post_08_18.dta"
+ 
+renvars ED_DISCHARGE_DIAG_CODE_1 ED_DISCHARGE_DIAG_CODE_2 ED_DISCHARGE_DIAG_CODE_3 MAIN_PROBLEM OTHER_PROBLEM_1 OTHER_PROBLEM_2 /// 
+OTHER_PROBLEM_3 OTHER_PROBLEM_4 OTHER_PROBLEM_5 OTHER_PROBLEM_6 OTHER_PROBLEM_7 OTHER_PROBLEM_8 OTHER_PROBLEM_9 \ Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+
+keep mbun Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+
+save "C:\Users\llb296\Cloz_2023\adverse\nacrs_for_append.dta"
+
+***********
+
+use "C:\Users\llb296\Cloz_2023\adverse\dad_post_08_18.dta"
+
+renvars DIAG_CODE_1 DIAG_CODE_2 DIAG_CODE_3 DIAG_CODE_4 DIAG_CODE_5 DIAG_CODE_6 DIAG_CODE_7 DIAG_CODE_8 DIAG_CODE_9 ///
+DIAG_CODE_10 DIAG_CODE_11 DIAG_CODE_12 DIAG_CODE_13 DIAG_CODE_14 DIAG_CODE_15 DIAG_CODE_16 DIAG_CODE_17 DIAG_CODE_18 DIAG_CODE_19 ///
+DIAG_CODE_20 DIAG_CODE_21 DIAG_CODE_22 DIAG_CODE_23 DIAG_CODE_24 DIAG_CODE_25 \ Dx_1 Dx_2 Dx_3 Dx_4	Dx_5 Dx_6 Dx_7 Dx_8	Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25
+
+keep mbun Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25
+
+save "C:\Users\llb296\Cloz_2023\adverse\dad_for_append.dta", replace
+
+************
+use "C:\Users\llb296\Cloz_2023\adverse\dad_for_append.dta"
+
+append using "C:\Users\llb296\Cloz_2023\adverse\nacrs_for_append.dta", generate(_appended)
+
+save "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_fup_adv.dta", replace
+
+
+//Corrected to include I514 (11 Nov 2020)
+gen myocarditis = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace myocarditis = 1 if inlist(`var', "I401","I408", "I409", "I41", "I514")
+}
+
+//Corrected to include I422 (11 Nov 2020)
+gen cardiomyopathy = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace cardiomyopathy = 1 if inlist(`var', "I420", "I421", "I422" "I423" "I424", "I425", "I427", "I428", "I429")
+}
+
+gen neutropenia = 0
+
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace neutropenia = 1 if inlist(`var', "D700")
+}
+
+gen pneum = 0 
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+    replace pneum = 1 if regexm(`var', "(^J1+)([2-8]+)")
+}
+keep myocarditis cardiomyopathy neutropenia pneum mbun
+
+save "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_4_collapse_mbun.dta"
+*********************Collapse by MBUN to aggregate multiple records*******************
+use "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_4_collapse_mbun.dta"
+
+collapse (sum) myocarditis cardiomyopathy neutropenia pneum, by(mbun)
+save "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_adv_summed_by_person.dta"
+************************Now merge the adult cohort and tabulate*************************************
+use "C:\Users\llb296\Cloz_2023\Adverse_analysis_adults_28_feb.dta"
+keep mbun
+bysort mbun: keep if _n==1
+
+save "C:\Users\llb296\Cloz_2023\adverse\adults_adverse_counts.dta"
+merge m:1 mbun using "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_adv_summed_by_person.dta"
+foreach var of varlist myocarditis cardiomyopathy neutropenia pneum{
+	
+	tab `var', miss
+}
+
+
+********************Do the same for children/adolescents********************************************
+use "C:\Users\llb296\Cloz_2023\Adverse_analysis_kids.dta"
+keep mbun
+bysort mbun: keep if _n==1
+
+save "C:\Users\llb296\Cloz_2023\adverse\kids_adverse_counts.dta"
+merge m:1 mbun using "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_adv_summed_by_person.dta"
+drop if _m==2
+
+save, replace
+foreach var of varlist myocarditis cardiomyopathy neutropenia pneum{
+	
+	tab `var', miss
+}
