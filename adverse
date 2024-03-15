@@ -1,4 +1,19 @@
 ***This contains the code for Adverse event models 
+//First collapse similar spells and remove overlaps
+
+//Merge spells of the same type
+newspell merge, merge(1=1 3=3 4=4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop spelltype_new
+replace advers=0 if advers==.
+
+//Handle overlaps
+newspell rank, rank(1,3,4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop split
+
 //ADULTS MODEL
 Scale = hazard
 use  "C:\Users\llb296\Cloz_2023\bkups\Adverse_analysis_adults_28_feb.dta"
@@ -35,6 +50,19 @@ legend(ring(0) bplacement(swest) order(1 "Other drug" 2 "Clozapine")))
 graph save "Graph" "C:\Users\llb296\Cloz_2023\Advers_adults_graph.gph", replace
 ********************************************************************************
 //CHILD/YOUTH MODEL
+//First collapse similar spells and remove overlaps
+//Merge spells of the same type
+newspell merge, merge(1=1 3=3 4=4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop spelltype_new
+replace advers=0 if advers==.
+
+//Handle overlaps
+newspell rank, rank(1,3,4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop split
 
 /*Kids adverse: Weibull
 file: Adverse_anlaysis_kids.dta
