@@ -1,4 +1,18 @@
 //This contains the models for MH relapse
+
+*First create spells and rank by priority
+//Merge spells of the same type
+newspell merge, merge(2=2 3=3 4=4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop spelltype_new
+
+//Handle overlaps
+newspell rank, rank(2,3,4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop split
+
 use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
 stset epis_end_dt, id(mbun) failure(rehosp==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
 foreach scale in hazard{
@@ -35,6 +49,19 @@ graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_adults_graph.gph", replace
 save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame.dta", replace
 
 ************* Do the same for the child cohort*****************
+*First create spells and rank by priority
+//Merge spells of the same type
+newspell merge, merge(2=2 3=3 4=4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop spelltype_new
+
+//Handle overlaps
+newspell rank, rank(2,3,4) id(mbun) stype(spelltype) snumber(row) begin(epis_beg_dt) end(epis_end_dt) newsnumber(row_new) sort(epis_beg_dt)
+drop row
+ren row_new row
+drop split
+
 use "Analysis_file_kids_7_Feb.dta"
 stset epis_end_dt, id(mbun) failure(rehosp==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
 
