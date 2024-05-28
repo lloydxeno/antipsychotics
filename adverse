@@ -67,7 +67,7 @@ ren row_new row
 drop split
 
 /*Kids adverse: Weibull
-file: Adverse_anlaysis_kids.dta
+file: Adverse_anlaysis_kids_28_may.dta
 stset epis_end_dt, id(mbun) failure(advers==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
 foreach scale in hazard{
 		display _n "Scale = `scale'"
@@ -78,23 +78,25 @@ foreach scale in hazard{
 }
 
 
-df = 1, AIC =     524.91 BIC =     537.27
-df = 2, AIC =     526.90 BIC =     541.33
-df = 3, AIC =     526.11 BIC =     542.60
-df = 4, AIC =     527.48 BIC =     546.02
-df = 5, AIC =     529.16 BIC =     549.77
+Scale = hazard
+df = 1, AIC =     514.70 BIC =     526.96
+df = 2, AIC =     516.70 BIC =     531.00
+df = 3, AIC =     516.30 BIC =     532.65
+df = 4, AIC =     517.79 BIC =     536.18
+df = 5, AIC =     519.33 BIC =     539.76
+
 
 
 stpm3 i.clozapine age i.female i.rural_unk, df(1) scale(lncumhazard) vce(cluster mbun) eform difficult
 range tt 0 120 100
-standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(kidsadvers, replace)
-frame change kidsadvers
+standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(kidsadvers_28may, replace)
+frame change kidsadvers_28may
 lab var Scloz0 "Other drug"
 lab var Scloz1 "Clozapine"
 
-save "C:\Users\llb296\Cloz_2023\Kids_adverse_frame.dta", replace
+save "C:\Users\llb296\Cloz_2023\Kids_adverse_frame_28may.dta", replace
 twoway (rarea Scloz0_lci Scloz0_uci tt, pstyle(ci) sort xscale(r(0 120)) xlabel(0 20 40 60 80 100 120) fc(green%25)) (rarea Scloz1_lci Scloz1_uci tt, pstyle(ci) sort xscale(r(0 120))fc(red%25)) ///
 (line Scloz0 tt, sort lcolor(green) lstyle(refline) lp(dash) lwidth(vthin)) (line Scloz1 tt, sort lcolor(red) lstyle(refline) lp(solid) lwidth(vthin) xtitle("Follow-up in months") subtitle("") ///
 legend(ring(0) bplacement(swest) order(1 "Other drug" 2 "Clozapine"))) 
 
-graph save "Graph" "C:\Users\llb296\Cloz_2023\Advers_kids_graph.gph"
+graph save "Graph" "C:\Users\llb296\Cloz_2023\Advers_kids_graph_28may.gph"
