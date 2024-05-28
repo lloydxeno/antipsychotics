@@ -1,0 +1,26 @@
+*Reconstruct the adverse analysis file
+*to include constipation K590
+
+use "C:\Users\llb296\Cloz_2023\adverse\nacrs_post_08_18.dta"
+
+renvars ED_DISCHARGE_DIAG_CODE_1 ED_DISCHARGE_DIAG_CODE_2 ED_DISCHARGE_DIAG_CODE_3 MAIN_PROBLEM OTHER_PROBLEM_1 OTHER_PROBLEM_2 /// 
+OTHER_PROBLEM_3 OTHER_PROBLEM_4 OTHER_PROBLEM_5 OTHER_PROBLEM_6 OTHER_PROBLEM_7 OTHER_PROBLEM_8 OTHER_PROBLEM_9 \ Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+
+*include epis_beg_dt and epis_end_dt
+
+keep mbun episode_beg_dt episode_end_dt Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+format episode_beg_dt episode_end_dt %td
+compress
+save "C:\Users\llb296\Cloz_2023\adverse\nacrs_for_append_with_dates.dta", replace
+
+
+use "C:\Users\llb296\Cloz_2023\adverse\dad_post_08_18.dta"
+
+renvars DIAG_CODE_1 DIAG_CODE_2 DIAG_CODE_3 DIAG_CODE_4 DIAG_CODE_5 DIAG_CODE_6 DIAG_CODE_7 DIAG_CODE_8 DIAG_CODE_9 ///
+DIAG_CODE_10 DIAG_CODE_11 DIAG_CODE_12 DIAG_CODE_13 DIAG_CODE_14 DIAG_CODE_15 DIAG_CODE_16 DIAG_CODE_17 DIAG_CODE_18 DIAG_CODE_19 ///
+DIAG_CODE_20 DIAG_CODE_21 DIAG_CODE_22 DIAG_CODE_23 DIAG_CODE_24 DIAG_CODE_25 \ Dx_1 Dx_2 Dx_3 Dx_4	Dx_5 Dx_6 Dx_7 Dx_8	Dx_9 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25
+
+keep mbun episode_beg_dt episode_end_dt Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 Dx_10 Dx_11 Dx_12 Dx_13
+format episode_beg_dt episode_end_dt %td
+compress
+save "C:\Users\llb296\Cloz_2023\adverse\dad_for_append_with_dates.dta", replace
