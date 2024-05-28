@@ -89,7 +89,7 @@ df = 5, AIC =     519.33 BIC =     539.76
 
 stpm3 i.clozapine age i.female i.rural_unk, df(1) scale(lncumhazard) vce(cluster mbun) eform difficult
 range tt 0 120 100
-standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(kidsadvers_28may, replace)
+standsurv if cloz<., at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(kidsadvers_28may, replace)
 frame change kidsadvers_28may
 lab var Scloz0 "Other drug"
 lab var Scloz1 "Clozapine"
