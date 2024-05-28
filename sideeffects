@@ -57,7 +57,14 @@ foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
 Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
     replace pneum = 1 if regexm(`var', "(^J1+)([2-8]+)")
 }
-keep myocarditis cardiomyopathy neutropenia pneum mbun
+
+gen constip = 0
+foreach var of varlist Dx_1 Dx_2 Dx_3 Dx_4 Dx_5 Dx_6 Dx_7 Dx_8 Dx_9 ///
+Dx_10 Dx_11 Dx_12 Dx_13 Dx_14 Dx_15 Dx_16 Dx_17 Dx_18 Dx_19 Dx_20 Dx_21 Dx_22 Dx_23 Dx_24 Dx_25{
+	replace constip = 1 if inlist(`var', "K590")
+}
+
+keep myocarditis cardiomyopathy neutropenia pneum constip mbun
 
 save "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_4_collapse_mbun.dta"
 *********************Collapse by MBUN to aggregate multiple records*******************
