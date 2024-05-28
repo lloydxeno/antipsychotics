@@ -28,11 +28,13 @@ foreach scale in hazard{
 }
 
 
-df = 1, AIC =   46912.43 BIC =   46953.86
-df = 2, AIC =   46832.50 BIC =   46880.83
-df = 3, AIC =   46832.92 BIC =   46888.16
-df = 4, AIC =   46822.62 BIC =   46884.76
-df = 5, AIC =   46814.90 BIC =   46883.95
+Scale = hazard
+df = 1, AIC =   42642.56 BIC =   42683.23
+df = 2, AIC =   42550.15 BIC =   42597.59
+df = 3, AIC =   42550.75 BIC =   42604.97
+df = 4, AIC =   42544.01 BIC =   42605.01
+df = 5, AIC =   42541.35 BIC =   42609.13
+
 
 
 stset epis_end_dt, id(mbun) failure(advers==1)  origin(spelltype==3 4 time epis_beg_dt)  exit(time .) scale(30)
