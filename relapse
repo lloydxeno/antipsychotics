@@ -14,29 +14,40 @@ ren row_new row
 drop split
 
 use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
+drop adult- _ns_t0_tvc5
+stset, clear
+
+//Handle gaps > 30 days between last drug and relapse
+sort mbun epis_beg_dt epis_end_dt
+by mbun: gen gap = epis_beg_dt-epis_end_dt[_n-1] if rehosp==1 & rehosp[_n-1]==0
+by mbun: replace clozapine=1 if rehosp==1 & gap < 30 & clozapine[_n-1]==1
+by mbun: replace clozapine=0 if rehosp==1 & gap < 30 & clozapine[_n-1]==0
+
+
 stset epis_end_dt, id(mbun) failure(rehosp==1) exit(time .) origin(spelltype==3 4 time epis_beg_dt) scale(30)
+
 foreach scale in hazard{
-		display _n "Scale = `scale'"
-		forvalues j = 1/5{
-		quietly: stpm3 i.clozapine age i.female i.rural_unk, df(`j') scale(lncumhazard) vce(cluster mbun) eform difficult
-		display "df = `j', AIC = " %10.2f e(AIC) " BIC = " %10.2f e(BIC)
-		}
-}
+                  display _n "Scale = `scale'"
+                  forvalues j = 1/5{
+                quietly: stpm3 i.clozapine age i.female i.rural_unk, df(`j') scale(lncumhazard) vce(cluster mbun) eform difficult
+                  display "df = `j', AIC = " %10.2f e(AIC) " BIC = " %10.2f e(BIC)
+                  }
+ }
 
-/*Scale = hazard
+Scale = hazard
+df = 1, AIC =  240204.47 BIC =  240264.97
+df = 2, AIC =  240156.18 BIC =  240226.75
+df = 3, AIC =  240161.67 BIC =  240242.33
+df = 4, AIC =  239033.82 BIC =  239124.56
+df = 5, AIC =  237554.32 BIC =  237655.14
 
-df = 1, AIC =  238824.91 BIC =  238885.40
-df = 2, AIC =  238785.32 BIC =  238855.90
-df = 3, AIC =  238791.25 BIC =  238871.91
-df = 4, AIC =  237656.69 BIC =  237747.43
-df = 5, AIC =  236183.27 BIC =  236284.09
-*/
+
 
 stpm3 i.clozapine age i.female i.rural_unk, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
 range tt 0 120 100
-standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(adults_rehosp_frame, replace)
-frame change adults_rehosp_frame
-save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame.dta", replace
+standsurv, at1(clozapine 0) at2(clozapine 1) atvars(Scloz0 Scloz1)  timevar(tt) ci frame(adults_rehosp_frame_28may, replace)
+frame change adults_rehosp_frame_28may
+save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame_28may.dta", replace
 
 
 //Switch to adults_rehosp_frame to plot
@@ -46,7 +57,7 @@ twoway (rarea Scloz0_lci Scloz0_uci tt, pstyle(ci) sort xscale(r(0 120)) xlabel(
 (line Scloz0 tt, sort lcolor(green) lstyle(refline) lp(dash) lwidth(vthin)) (line Scloz1 tt, sort lcolor(red) lstyle(refline) lp(solid) lwidth(vthin) xtitle("Follow-up in months") subtitle("") ///
 legend(ring(0) bplacement(neast) order(1 "Other drug" 2 "Clozapine"))) 
 graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_adults_graph.gph", replace
-save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame.dta", replace
+save "C:\Users\llb296\Cloz_2023\Adults_reshosp_frame_28may.dta", replace
 
 ************* Do the same for the child cohort*****************
 *First create spells and rank by priority
