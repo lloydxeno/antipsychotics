@@ -1,1 +1,10 @@
 
+stpm3 i.clozapine age i.female i.rural_unk, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
+predict hcloz hother,  hazard ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultshaz)
+//Switch to adultshaz frame	
+collapse (mean) hcloz hother	
