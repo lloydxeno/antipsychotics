@@ -8,3 +8,4 @@ predict hcloz hother,  hazard ///
 	frame(adultshaz)
 //Switch to adultshaz frame	
 collapse (mean) hcloz hother	
+save "C:\Users\llb296\Cloz_2023\adultshazmay28.dta"
