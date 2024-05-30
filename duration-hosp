@@ -1,1 +1,21 @@
 
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults_28may.dta"
+gen duration = epis_end_dt- epis_beg_dt if spelltype==2 & clozapine <.
+keep if duration <. & spelltype==2
+keep mbun duration clozapine
+save "C:\Users\llb296\Cloz_2023\Rehosp_durations.dta", replace
+
+collapse (sum) duration, by(mbun clozapine)
+collapse (mean) duration, by(clozapine)
+
+**Children / Youth
+use "C:\Users\llb296\Cloz_2023\Analysis_file_kids_7_Feb.dta"
+
+gen duration = epis_end_dt- epis_beg_dt if spelltype==2 & clozapine <.
+keep if duration <. & spelltype==2
+keep mbun duration clozapine
+
+save "C:\Users\llb296\Cloz_2023\Rehosp_durations_kids.dta", replace
+
+collapse (sum) duration, by(mbun clozapine)
+collapse (mean) duration, by(clozapine)
