@@ -7,7 +7,7 @@ foreach var of varlist myocarditis cardiomyopathy neutropenia pneum constip{
 }
 
 //N persons with each event
-collapse (min) myocarditis cardiomyopathy neutropenia pneum constip, by(mbun)
+collapse (max) myocarditis cardiomyopathy neutropenia pneum constip, by(mbun)
 
 foreach var of varlist myocarditis cardiomyopathy neutropenia pneum constip{
 	tab `var', miss
@@ -21,7 +21,7 @@ foreach var of varlist myocarditis cardiomyopathy neutropenia pneum constip{
 }
 
 //N persons with each event
-collapse (min) myocarditis cardiomyopathy neutropenia pneum constip, by(mbun)
+collapse (max) myocarditis cardiomyopathy neutropenia pneum constip, by(mbun)
 
 foreach var of varlist myocarditis cardiomyopathy neutropenia pneum constip{
 	tab `var', miss
