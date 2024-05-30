@@ -3,14 +3,15 @@
 *Number of admissions avoided in Adults
 use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults_28may.dta"
 stpm3 i.clozapine age i.female i.rural_unk, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
-predict hcloz hother,  hazard ci ///
-	at1(clozapine 1 .) ///
-	at2 (clozapine 0 .) ///
-	timevar(tt) ///
-	per(1000) ///
-	frame(adultshaz)
-frame change adultshaz	
-collapse (mean) hcloz hother	
+ predict hcloz hother, hazard ci ///
+         at1(clozapine 1 .) ///
+         at2 (clozapine 0 .) ///
+         timevar(tt) ///
+         per(1000) ///
+         frame(adultshaz28may)
+frame change adultshaz28may     
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci          
+
 
 *Number of admissions avoided in Children
 use "C:\Users\llb296\Cloz_2023\Analysis_file_kids_7_Feb.dta"
@@ -20,9 +21,9 @@ predict hcloz hother,  hazard ci///
 	at2 (clozapine 0 .) ///
 	timevar(tt) ///
 	per(1000) ///
-	frame(childhaz)
-frame change childhaz	
-collapse (mean) hcloz hother			
+	frame(childhaz28may)
+frame change childhaz28may	
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci          	
 
 *********************ADVERSE ADMISSIONS***********************
 use "C:\Users\llb296\Cloz_2023\Adverse_analysis_adults_28_may.dta"
