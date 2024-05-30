@@ -1,5 +1,7 @@
 
-****************************Tabulating Adverse Events***********************
+****************************Tabulating Adverse Events (Incidence and People)***********************
+
+*****************************Adults******************************************
 use "C:\Users\llb296\Cloz_2023\adverse\dad_nacrs_fup_adv_dates_adults.dta"
 
 foreach var of varlist myocarditis cardiomyopathy neutropenia pneum constip{
