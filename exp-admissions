@@ -1,7 +1,7 @@
 
 *********************RELAPSE ADMISSIONS*******************
 *Number of admissions avoided in Adults
-use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults_28may.dta"
 stpm3 i.clozapine age i.female i.rural_unk, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
 predict hcloz hother,  hazard ci ///
 	at1(clozapine 1 .) ///
