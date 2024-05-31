@@ -1,0 +1,14 @@
+
+
+***********************Adults **********************************
+cd "C:\Users\llb296\Cloz_2023"
+gr combine Rehosp_adults_graph_28may.gph Advers_adults_graph_may.gph, altshrink
+
+graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_advers_adults_cmb_31_may.gph"
+
+
+***********************Children and Youth*********************
+
+cd "C:\Users\llb296\Cloz_2023"
+gr combine Rehosp_kids_graph_28may.gph Advers_kids_graph_28may.gph, altshrink
+graph save "Graph" "C:\Users\llb296\Cloz_2023\Rehosp_advers_kids_cmb_31_may.gph"
