@@ -36,7 +36,7 @@ predict hcloz hother,  hazard ci ///
 	per(1000) ///
 	frame(adultadvhaz)
 frame change adultadvhaz	
-collapse (mean) hcloz hother		
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci     	
 
 
 use  "C:\Users\llb296\Cloz_2023\Adverse_analysis_kids_28_may.dta"
