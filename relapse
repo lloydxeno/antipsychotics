@@ -13,7 +13,7 @@ drop row
 ren row_new row
 drop split
 
-use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults.dta"
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults_28may.dta"
 drop adult- _ns_t0_tvc5
 stset, clear
 sort mbun epis_beg_dt epis_end_dt
