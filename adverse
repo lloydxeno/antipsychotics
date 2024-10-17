@@ -16,7 +16,7 @@ drop split
 
 //ADULTS MODEL
 Scale = hazard
-use  "C:\Users\llb296\Cloz_2023\bkups\Adverse_analysis_adults_28_feb.dta"
+use  "C:\Users\llb296\Cloz_2023\Adverse_analysis_adults_28_may.dta"
 stset epis_end_dt, id(mbun) failure(advers==1)  origin(spelltype==3 4 time epis_beg_dt)  exit(time .) scale(30)
 
 foreach scale in hazard{
