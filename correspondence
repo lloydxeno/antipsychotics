@@ -1,0 +1,150 @@
+use "C:\Users\llb296\Cloz_2023\Rehosp_analysis_adults_28may.dta"
+
+cd "C:\Users\llb296\Cloz_2023\BJP\Rebuttal"
+use "C:\Users\llb296\Cloz_2023\BJP\Rebuttal\Rehosp_adults_rebut.dta"
+
+
+//Now merge the initial DX codes to the hospitalization and adverse files
+*
+use "Rehosp_adults_rebut.dta"
+*Number of records before merge: 771,610
+merge m:1 mbun using "C:\Users\llb296\Cloz_2023\BJP\Rebuttal\Baseline_dx_adults_and_kids.dta", keepusing(schizoph schizaff bipolar)
+keep if _m==3
+*Number of records after merge: 771,610
+save, replace
+
+//Schizophrenia
+foreach scale in hazard{
+                    display _n "Scale = `scale'"
+                 forvalues j = 1/5{
+                  quietly: stpm3 i.clozapine age i.female i.rural_unk if schizoph==1, df(`j') scale(lncumhazard) vce(cluster mbun) eform difficult
+                    display "df = `j', AIC = " %10.2f e(AIC) " BIC = " %10.2f e(BIC)
+                   }
+}
+*df = 5 is the best
+
+stpm3 i.clozapine age i.female i.rural_unk if schizoph==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(clozapine age female rural_unk) dftvc(5) eform difficult
+gen schiz_est_sample = 0
+replace schiz_est_sample = 1 if e(sample)
+bysort schiz_est_sample mbun: gen schiz_unq=1 if _n==1 & schiz_est_sample==1
+tab schiz_unq
+drop schiz_est_sample schiz_unq
+
+
+//Bipolar disorder
+foreach scale in hazard{
+                    display _n "Scale = `scale'"
+                 forvalues j = 1/5{
+                  quietly: stpm3 i.clozapine age i.female i.rural_unk if bipolar==1, df(`j') scale(lncumhazard) vce(cluster mbun) eform difficult
+                    display "df = `j', AIC = " %10.2f e(AIC) " BIC = " %10.2f e(BIC)
+                   }
+}
+
+stpm3 i.clozapine age i.female i.rural_unk if bipolar==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(clozapine age female rural_unk) dftvc(5) eform difficult
+gen bipol_est_sample = 0
+replace bipol_est_sample = 1 if e(sample)
+bysort bipol_est_sample mbun: gen bipol_unq=1 if _n==1 & bipol_est_sample==1
+tab bipol_unq
+drop bipol_est_sample bipol_unq
+
+//Schizoaffective
+foreach scale in hazard{
+                    display _n "Scale = `scale'"
+                 forvalues j = 1/5{
+                  quietly: stpm3 i.clozapine age i.female i.rural_unk if schizaff==1, df(`j') scale(lncumhazard) vce(cluster mbun) eform difficult
+                    display "df = `j', AIC = " %10.2f e(AIC) " BIC = " %10.2f e(BIC)
+                   }
+}
+
+stpm3 i.clozapine age i.female i.rural_unk if schizaff==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(clozapine age female rural_unk) dftvc(5) eform difficult
+gen schizaff_est_sample = 0
+replace schizaff_est_sample = 1 if e(sample)
+bysort schizaff_est_sample mbun: gen schizaff_unq=1 if _n==1 & schizaff_est_sample==1
+tab schizaff_unq
+drop schizaff_est_sample schizaff_unq
+
+********************************Recalculate the expected number of hospitalizations per 1000 person-months*************************************
+
+use "Rehosp_adults_rebut.dta"
+******schizophrenia
+quietly stpm3 i.clozapine age i.female i.rural_unk if schizoph==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultrebut)
+frame change adultrebut	
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
+
+*******************bipolar
+quietly stpm3 i.clozapine age i.female i.rural_unk if bipolar==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultbipol)
+frame change adultbipol	
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
+*******************schizoaffective
+quietly stpm3 i.clozapine age i.female i.rural_unk if schizaff==1, df(5) scale(lncumhazard) vce(cluster mbun)  tvc(i.clozapine age i.female i.rural_unk) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultscza)
+frame change adultscza
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
+
+*######################################################################################################################################################
+*######################################################################################################################################################
+*###########################################Now do the same for RELAPSE in Adults #####################################################################
+
+use "C:\Users\llb296\Cloz_2023\Adverse_analysis_adults_28_may.dta"
+//number of records: 614,280
+merge m:1 mbun using "C:\Users\llb296\Cloz_2023\BJP\Rebuttal\Baseline_dx_adults_and_kids.dta", keepusing(schizoph schizaff bipolar)
+keep if _m==3
+//number of records: 614,280
+save, replace
+
+//Check the st setting
+stset
+stpm3 i.clozapine age i.female i.rural_unk if schizoph==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(clozapine age) dftvc(5) eform difficult
+
+quietly stpm3 i.clozapine age i.female i.rural_unk if schizoph==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(i.clozapine age) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultsczadv)
+frame change adultsczadv
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
+
+*********************************Bipolar********************************************
+stpm3 i.clozapine age i.female i.rural_unk if bipolar==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(clozapine age) dftvc(5) eform difficult
+
+quietly stpm3 i.clozapine age i.female i.rural_unk if bipolar==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(i.clozapine age) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultbipadv)
+frame change adultbipadv
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
+
+*********************************Schizoaffective********************************************
+stpm3 i.clozapine age i.female i.rural_unk if schizaff==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(clozapine age) dftvc(5) eform difficult
+
+quietly stpm3 i.clozapine age i.female i.rural_unk if schizaff==1, df(5) scale(lncumhazard) vce(cluster mbun) tvc(i.clozapine age) dftvc(5) eform difficult
+predict hcloz hother, hazard ci ///
+	at1(clozapine 1 .) ///
+	at2 (clozapine 0 .) ///
+	timevar(tt) ///
+	per(1000) ///
+	frame(adultscaffadv)
+frame change adultscaffadv
+collapse (mean) hcloz hcloz_lci hcloz_uci hother hother_lci hother_uci
